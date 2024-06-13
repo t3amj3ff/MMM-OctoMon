@@ -5,6 +5,9 @@
  *
  * By Chris Thomas
  * MIT Licensed.
+ * 
+ * Changed gasDataRequest display section to the one from MMM-IntelligentOctopus (https://github.com/ianmccon/MMM-IntelligentOctopus) to enable SMETS 2 feature
+ * Add gasMeterSMETSType: 2 to config.js
  */
  
 Module.register("MMM-OctoMon",{
@@ -27,6 +30,7 @@ Module.register("MMM-OctoMon",{
 		showUpdateTime: true,
 		retryDelay: 5000,
 		animationSpeed: 2000,
+		gasMeterSMETSType: 2,
 	},
 
 	start: function() {
@@ -287,25 +291,36 @@ Module.register("MMM-OctoMon",{
 				}
 			}
 			
-			if (this.gasDataRequest) {
-				for(i=0;i<intDays;i++) {
-					if(typeof this.gasDataRequest.results[i] !== 'undefined') {
-						var edate = new Date(this.gasDataRequest.results[i].interval_start);
-						if(edate.toLocaleDateString() == dteLoop.toLocaleDateString()) {
-							
-							var strCol = "white";//could be green
-							var intVal = this.gasDataRequest.results[i].consumption.toFixed(this.config.decimalPlaces);
-							if(intVal>=this.config.gasMedium)strCol="color:orange";
-							if(intVal>=this.config.gasHigh)strCol="color:red";
+                        if (this.gasDataRequest) {
+                                for (i = 0; i < intDays + 1; i++) {
+                                        if (typeof this.gasDataRequest.results[i] !== 'undefined') {
+                                                var edate = new Date(this.gasDataRequest.results[i].interval_start);
+                                                if (edate.toLocaleDateString() == dteLoop.toLocaleDateString()) {
 
-							strUse = intVal + " kWh";
-							strCost = "";
-							if(this.config.gasCostKWH>0)
-								strCost = "£" + (Math.round(((intVal * this.config.gasCostKWH)+this.config.gasCostSC) * 100)/100).toFixed(2);
+                                                        var strCol = "color:green"; //could be green
+                                                        var consumption = this.gasDataRequest.results[i].consumption;
+                                                        if (this.config.gasMeterSMETSType == '2')
+                                                                var intVal = (this.gasDataRequest.results[i].consumption * 1.02264 * 38.1 / 3.6).toFixed(this.config.decimalPlaces);
+                                                        else {
+                                                                var intVal = this.gasDataRequest.results[i].consumption.toFixed(this.config.decimalPlaces);
+                                                        }
+                                                        if (consumption >= this.config.gasMedium) strCol = "color:orange";
+                                                        if (consumption >= this.config.gasHigh) strCol = "color:red";
 
-							//display gas energy usage and cost here
-							thisgaslabel.innerHTML = "&nbsp;&nbsp;<span style=\"" + strCol + "\">" + strUse + " " + strCost + "</span>";
-							thisgaslabel.style.textAlign = "right";
+                                                        usage = this.gasDataRequest.results[i].consumption.toFixed(this.config.decimalPlaces);
+                                                        if (this.config.gasMeterSMETSType == '2')
+                                                                strUse = usage + " m<sup>3</sup>";
+                                                        else {
+                                                                strUse = usage + "  kwh";
+                                                        }
+                                                        strCost = "";
+                                                        if (this.config.gasCostKWH > 0)
+                                                                strCost = "£" + (Math.round(((intVal * this.config.gasCostKWH) + this.config.gasCostSC) * 100) / 100).toFixed(2);
+
+                                                        //display gas energy usage and cost here
+                                                        thisgaslabel.innerHTML = "&nbsp;&nbsp;<span style=\"" + strCol + "\">" + strUse + " " + strCost + "</span>";
+                                                        thisgaslabel.style.textAlign = "right";
+
 
 						}
 					}
