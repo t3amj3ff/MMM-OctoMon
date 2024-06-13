@@ -6,6 +6,7 @@
  * By Chris Thomas
  * MIT Licensed.
  * 
+ * T3amJ3ff
  * Changed gasDataRequest display section to the one from MMM-IntelligentOctopus (https://github.com/ianmccon/MMM-IntelligentOctopus) to enable SMETS 2 feature
  * Add gasMeterSMETSType: 2 to config.js
  */
